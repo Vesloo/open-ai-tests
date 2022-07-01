@@ -1,13 +1,10 @@
 const { Configuration, OpenAIApi } = require("openai");
 const fs = require("fs-extra");
-const mineflayer = require("mineflayer");
 require("dotenv").config();
+require('./script.js');
 
-const bot = mineflayer.createBot({
-    host: "192.168.1.3",
-    port: 57465,
-    username: "Mybeautybot",
-});
+
+
 
 async function main() {
     const configuration = new Configuration({
