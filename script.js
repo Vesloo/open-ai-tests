@@ -10,13 +10,15 @@ const {
 // Create the bot
 const bot = mineflayer.createBot({
     host: "localhost",
-    port: 57986,
+    port: 55389,
     username: "Mybeautybot",
 });
 
 // Say a message when the bot is spawned
 bot.on("spawn", () => {
     bot.chat("/tell @a I'm a bot!");
+    bot.loadPlugin(pathfinder);
+
 });
 
 // Say a message when the bot is killed
@@ -32,109 +34,56 @@ bot.on("chat", (username, message) => {
     }
 });
 
-// Attack the closest entity
+// Move the bot when player says move
 bot.on("chat", (username, message) => {
-    if (message === "attack") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.attack(target, true);
-            bot.chat("/tell @a I attack the entity");
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
+    if (message === "move") {
+        bot.setControlState("forward", true);
+        setTimeout(() => {
+            bot.setControlState("forward", false);
+        }, 3000);
     }
 });
 
-// Follow the closest player
 bot.on("chat", (username, message) => {
-    if (message === "follow") {
-        const target = bot.nearestPlayer();
-        if (target) {
-            bot.lookAt(target);
-            bot.setControlState("forward", true);
-            bot.chat("/tell @a I follow the player");
-        } else {
-            bot.chat("/tell @a No player close to me");
-        }
+    if (message === "where") {
+        bot.chat("/tell @a I'm at " + bot.entity.position);
     }
 });
 
-// Stop the bot
+bot.on("chat", (username, message) => {
+    if (message === "go") {
+        const destination = { x: -2, y: 73, z: -3 };
+        const path = bot.navigate.findPathSync(destination);
+        bot.navigate.walk(path, {
+            endRadius: 1,
+            timeout: 1000,
+        });
+    }
+});
+
+// When the player says stop, stop the bot
 bot.on("chat", (username, message) => {
     if (message === "stop") {
-        bot.chat("/tell @a I stop");
-        bot.pathfinder.setMovements(bot.entity);
+        bot.stop();
     }
 });
 
-// Get mob type of nearest entity
+// When the player says move, move the bot
 bot.on("chat", (username, message) => {
-    if (message === "mob") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.chat("/tell @a " + target.entityType);
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
+    if (message === "move") {
+        bot.setControlState("forward", true);
+        setTimeout(() => {
+            bot.setControlState("forward", false);
+        }, 3000);
     }
 });
 
-// Get mob type of nearest entity
+// When the player says turn around, turn around the bot
 bot.on("chat", (username, message) => {
-    if (message === "name") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.chat("/tell @a " + target.username);
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
-    }
-});
-
-// Get position of nearest entity
-bot.on("chat", (username, message) => {
-    if (message === "position") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.chat("/tell @a " + JSON.stringify(target.position));
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
-    }
-});
-
-// Get health of nearest entity
-bot.on("chat", (username, message) => {
-    if (message === "health") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.chat("/tell @a " + target.health);
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
-    }
-});
-
-// Get health of nearest entity
-bot.on("chat", (username, message) => {
-    if (message === "armor") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.chat("/tell @a " + target.armor);
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
-    }
-});
-
-// Get name of nearest entity
-bot.on("chat", (username, message) => {
-    if (message === "name") {
-        const target = bot.nearestEntity();
-        if (target) {
-            bot.chat("/tell @a " + target.name);
-        } else {
-            bot.chat("/tell @a No entity close to me");
-        }
+    if (message === "turn around") {
+        bot.setControlState("back", true);
+        setTimeout(() => {
+            bot.setControlState("back", false);
+        }, 3000);
     }
 });
