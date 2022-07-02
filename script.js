@@ -46,24 +46,17 @@ bot.on("chat", (username, message) => {
 });
 
 // Follow the closest player
-bot.once("spawn", () => {
-    const mcData = require("minecraft-data")(bot.version);
-    const defaultMove = new Movements(bot, mcData);
-
-    bot.on("chat", (username, message) => {
-        if (username === bot.username) return;
-        if (message !== "come") return;
-        const target = bot.players[username].entity;
-        if (!target) {
-            bot.chat("I don't see you !");
-            return;
+bot.on("chat", (username, message) => {
+    if (message === "follow") {
+        const target = bot.nearestPlayer();
+        if (target) {
+            bot.lookAt(target);
+            bot.setControlState("forward", true);
+            bot.chat("/tell @a I follow the player");
+        } else {
+            bot.chat("/tell @a No player close to me");
         }
-        const { x: playerX, y: playerY, z: playerZ } = target.position;
-
-        bot.navigate.to(
-            target.entity.position.offset(playerX, playerY, playerZ)
-        );
-    });
+    }
 });
 
 // Stop the bot
