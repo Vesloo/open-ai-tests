@@ -1,7 +1,11 @@
 // Create a bot that play minecraft with mineflayer
 // require mineflayer
 const mineflayer = require("mineflayer");
-const { pathfinder, Movements, goals: { GoalNear } } = require('mineflayer-pathfinder')
+const {
+    pathfinder,
+    Movements,
+    goals: { GoalNear },
+} = require("mineflayer-pathfinder");
 
 // Create the bot
 const bot = mineflayer.createBot({
@@ -42,25 +46,25 @@ bot.on("chat", (username, message) => {
 });
 
 // Follow the closest player
-bot.once('spawn', () => {
-    const mcData = require('minecraft-data')(bot.version)
-    const defaultMove = new Movements(bot, mcData)
-  
-    bot.on('chat', (username, message) => {
-      if (username === bot.username) return
-      if (message !== 'come') return
-      const target = bot.players[username].entity
-      if (!target) {
-        bot.chat("I don't see you !")
-        return
-      }
-      const { x: playerX, y: playerY, z: playerZ } = target.position
-  
-      bot.pathfinder.setMovements(defaultMove)
-      bot.pathfinder.setGoal(new GoalNear(playerX, playerY, playerZ, RANGE_GOAL))
-    })
-})
+bot.once("spawn", () => {
+    const mcData = require("minecraft-data")(bot.version);
+    const defaultMove = new Movements(bot, mcData);
 
+    bot.on("chat", (username, message) => {
+        if (username === bot.username) return;
+        if (message !== "come") return;
+        const target = bot.players[username].entity;
+        if (!target) {
+            bot.chat("I don't see you !");
+            return;
+        }
+        const { x: playerX, y: playerY, z: playerZ } = target.position;
+
+        bot.navigate.to(
+            target.entity.position.offset(playerX, playerY, playerZ)
+        );
+    });
+});
 
 // Stop the bot
 bot.on("chat", (username, message) => {
